@@ -1,6 +1,5 @@
 import { model, Schema } from 'mongoose';
 import validator from 'validator';
-import bcrypt from 'bcrypt';
 import {
   TGuardian,
   TLocalGuardian,
@@ -8,7 +7,6 @@ import {
   StudentModel,
   TUserName,
 } from './student.interface';
-import config from '../../config';
 
 const userNameSchema = new Schema<TUserName>({
   firstName: {
@@ -86,9 +84,11 @@ const studentSchema = new Schema<TStudent, StudentModel>({
     type: userNameSchema,
     required: true,
   },
-  password: {
-    type: String,
-    required: [true, "Password is required"]
+  user: {
+    type: Schema.Types.ObjectId,
+    required: [true, 'User ID is required'],
+    unique: true,
+    ref: 'User'
   },
   gender: {
     type: String,
@@ -128,33 +128,12 @@ const studentSchema = new Schema<TStudent, StudentModel>({
     required: true,
   },
   profileImage: { type: String },
-  isActive: {
-    type: String,
-    enum: ['active', 'blocked'],
-    default: 'active',
-  },
   isDeleted: {
     type: Boolean,
     default: false
   }
 });
 
-
-//pre save middleware / will work on create() save() function
-
-studentSchema.pre('save', async function(next){
-  // eslint-disable-next-line @typescript-eslint/no-this-alias
-  const user = this;
-  //hashing password and save into db
-  user.password = await bcrypt.hash(user.password, Number(config.bcrypt_salt_rounds));
-  next()
-})
-
-studentSchema.post('save', function(doc, next) {
-  doc.password = '';
-
-  next()
-})
 
 //query middleware
 studentSchema.pre('find', function(next) {
