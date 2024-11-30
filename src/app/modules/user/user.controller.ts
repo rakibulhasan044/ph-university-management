@@ -1,14 +1,11 @@
-import { NextFunction, Request, Response } from 'express';
+import { RequestHandler } from 'express';
 import { UserServices } from './user.service';
 import sendResponse from '../../utils/sendResponse';
 import httpStatus from 'http-status';
+import catchAsync from '../../utils/catchAsync';
 
-const createStudent = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
+const createStudent: RequestHandler = catchAsync(async (req, res) => {
+
     const { password, student: studentData } = req.body;
 
     //data validation using zod
@@ -26,10 +23,7 @@ const createStudent = async (
       message: 'Student is created successfully',
       data: result
     })
-  } catch (error) {
-    next(error);
-  }
-};
+});
 
 export const UserControllers = {
   createStudent,
