@@ -88,7 +88,7 @@ const studentSchema = new Schema<TStudent, StudentModel>({
     type: Schema.Types.ObjectId,
     required: [true, 'User ID is required'],
     unique: true,
-    ref: 'User'
+    ref: 'User',
   },
   gender: {
     type: String,
@@ -130,40 +130,39 @@ const studentSchema = new Schema<TStudent, StudentModel>({
   profileImage: { type: String },
   isDeleted: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 });
 
-
 //query middleware
-studentSchema.pre('find', function(next) {
-  this.find({isDeleted: {$ne: true}});
-  next()
-})
+studentSchema.pre('find', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
 
-studentSchema.pre('find', function(next) {
-  this.findOne({isDeleted: {$ne: true}});
-  next()
-})
+studentSchema.pre('find', function (next) {
+  this.findOne({ isDeleted: { $ne: true } });
+  next();
+});
 
-studentSchema.pre('aggregate', function(next) {
+studentSchema.pre('aggregate', function (next) {
   this.pipeline().unshift({
     $match: {
       isDeleted: {
-        $ne: true
-      }
-    }
-  })
-  next()
-})
+        $ne: true,
+      },
+    },
+  });
+  next();
+});
 
 //creating a custom static method
 
-studentSchema.statics.isUserExist = async function(id: string) {
-  const existingUser = await Student.findOne({id});
+studentSchema.statics.isUserExist = async function (id: string) {
+  const existingUser = await Student.findOne({ id });
 
   return existingUser;
-}
+};
 
 //creating a custom instance method
 // studentSchema.methods.isUserExist = async function(id: string) {
