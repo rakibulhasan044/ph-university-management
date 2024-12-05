@@ -5,12 +5,25 @@ import { AcademicFacultyControllers } from './academicFaculty.controller';
 
 const router = express.Router()
 
-router.post('/create-academic-faculty', validateRequest(AcademicFacultyValidation.createAcademicFacultyValidationSchema), (AcademicFacultyControllers.createAcademicFaculty))
+router.post(
+    '/create-academic-faculty',
+    validateRequest(AcademicFacultyValidation.createAcademicFacultyValidationSchema),
+    (AcademicFacultyControllers.createAcademicFaculty))
 
-router.get('/', AcademicFacultyControllers.getAllAcademicFaculties)
+router.get(
+    '/',
+    AcademicFacultyControllers.getAllAcademicFaculties
+)
 
-router.get('/:facultyId', AcademicFacultyControllers.getSingleFaculty)
+router.get(
+    '/:facultyId',
+    AcademicFacultyControllers.getSingleFaculty
+)
 
-router.patch('/:facultyId', validateRequest(AcademicFacultyValidation.updateAcademicFacultyValidationSchema), AcademicFacultyControllers.updateAcademicFaculty)
+router.patch(
+    '/:facultyId',
+    validateRequest(AcademicFacultyValidation.updateAcademicFacultyValidationSchema),
+    AcademicFacultyControllers.updateAcademicFaculty
+)
 
 export const AcademicFacultyRoutes = router;
