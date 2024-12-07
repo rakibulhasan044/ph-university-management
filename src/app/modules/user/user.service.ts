@@ -23,46 +23,45 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
   );
 
   if (!admissionSemester) {
-    throw new AppError(404, "Admission semester not found")
+    throw new AppError(404, 'Admission semester not found');
   }
 
   //transaction and rollback
   const session = await mongoose.startSession();
   try {
-    session.startTransaction()
+    session.startTransaction();
 
     //generate id
     userData.id = await generateStudentId(admissionSemester);
-  
+
     //create a user (transaction-1)
-    const newUser = await User.create([userData], {session}); //age chilo object transaction user korar jonno array hoise
-  
+    const newUser = await User.create([userData], { session }); //age chilo object transaction user korar jonno array hoise
+
     //create a student
     if (!newUser.length) {
-      throw new AppError(400, "Failed to create user")
+      throw new AppError(400, 'Failed to create user');
     }
-      //set id, _id as user
-      payload.id = newUser[0].id;
-      payload.user = newUser[0]._id; //reference _id
-  
-      //create a student (transaction-2)
-      const newStudent = await Student.create([payload], { session });
-      if (!newStudent.length) {
-        throw new AppError(400, "Failed to create student")
-      }
+    //set id, _id as user
+    payload.id = newUser[0].id;
+    payload.user = newUser[0]._id; //reference _id
 
-      await session.commitTransaction();
-      await session.endSession();
-      return newStudent;
-    
-    
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    //create a student (transaction-2)
+    const newStudent = await Student.create([payload], { session });
+    if (!newStudent.length) {
+      throw new AppError(400, 'Failed to create student');
+    }
+
+    await session.commitTransaction();
+    await session.endSession();
+    return newStudent;
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     await session.abortTransaction();
-    await session.endSession()
+    await session.endSession();
+
+    throw new AppError(400, 'Failed to create student');
   }
-
-
 };
 
 export const UserServices = {

@@ -27,7 +27,7 @@ academicDepartmentSchema.pre('save', async function (next) {
     throw new AppError(400, 'This department is already exist');
   }
   next();
-}); 
+});
 
 academicDepartmentSchema.pre('findOneAndUpdate', async function (next) {
   const query = this.getQuery();
