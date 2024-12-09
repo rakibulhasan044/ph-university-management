@@ -1,7 +1,11 @@
 import { ErrorRequestHandler } from 'express';
-import { ZodError, ZodIssue } from 'zod';
+import { ZodError } from 'zod';
 import { TErrorSources } from '../interface/error';
 import config from '../config';
+import handleZodError from '../errors/handleZodErrors';
+import handleValidationError from '../errors/handleValidationErrors';
+import handleCastError from '../errors/handleCastError';
+import handleDuplicateError from '../errors/handleDuplicateError';
 
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
   let statusCode = err.statusCode || 500;
@@ -14,22 +18,26 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
     },
   ];
 
-  const handleZodError = (zodErr: ZodError) => {
-    const errorSources: TErrorSources = zodErr.issues.map((issue: ZodIssue) => ({
-      path: issue?.path[issue.path.length - 1] as string,
-      message: issue.message,
-    }));
-    const statusCode = 400;
-
-    return {
-      statusCode,
-      message: 'Validation error',
-      errorSources,
-    };
-  };
-
   if (err instanceof ZodError) {
     const simplifiedError = handleZodError(err);
+    statusCode = simplifiedError.statusCode;
+    message = simplifiedError.message;
+    errorSources = simplifiedError.errorSources;
+  }
+  else if(err?.name == 'ValidationError') {
+    const simplifiedError = handleValidationError(err)
+    statusCode = simplifiedError.statusCode;
+    message = simplifiedError.message;
+    errorSources = simplifiedError.errorSources;
+  }
+  else if(err?.name == 'CastError') {
+    const simplifiedError = handleCastError(err)
+    statusCode = simplifiedError.statusCode;
+    message = simplifiedError.message;
+    errorSources = simplifiedError.errorSources;
+  }
+  else if(err?.code == 11000) {
+    const simplifiedError = handleDuplicateError(err)
     statusCode = simplifiedError.statusCode;
     message = simplifiedError.message;
     errorSources = simplifiedError.errorSources;
@@ -39,6 +47,7 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
     success: false,
     message,
     errorSources,
+    // err,
     stack: config.node_env === 'development' ? err?.stack : null,
   });
 
