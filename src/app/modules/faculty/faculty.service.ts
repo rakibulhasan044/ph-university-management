@@ -23,7 +23,7 @@ const getAllFacultiesFromDB = async (query: Record<string, unknown>) => {
 };
 
 const getSingleFacultyFromDB = async (id: string) => {
-  const result = await Faculty.findOne({ id }).populate('academicSemester');
+  const result = await Faculty.findById(id).populate('academicDepartment');
   return result;
 };
 
@@ -40,7 +40,7 @@ const updateFacultyIntoDB = async (id: string, payload: Partial<TFaculty>) => {
     }
   }
 
-  const result = await Faculty.findOneAndUpdate({ id }, modifiedUpdatedData, {
+  const result = await Faculty.findByIdAndUpdate(id, modifiedUpdatedData, {
     new: true,
     runValidators: true,
   });
