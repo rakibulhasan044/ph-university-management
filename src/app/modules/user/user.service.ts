@@ -16,6 +16,7 @@ import { Faculty } from '../faculty/faculty.model';
 const createStudentIntoDB = async (password: string, payload: TStudent) => {
   //create a user object
   const userData: Partial<TUser> = {};
+  console.log(userData);
 
   //if password is not given, use default password
   userData.password = password || (config.default_password as string);
@@ -70,6 +71,9 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
 
 const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
   const userData: Partial<TUser> = {};
+  
+  userData.password = password || (config.default_password as string);
+  
   userData.role = 'faculty';
 
   //find faculty academic department info
