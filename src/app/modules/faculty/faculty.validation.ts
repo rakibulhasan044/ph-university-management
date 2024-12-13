@@ -10,7 +10,7 @@ const createUserNameValidationSchema = z.object({
     .refine((value) => /^[A-Z]/.test(value), {
       message: 'Name must be start with capital letter',
     }),
-  middleName: z.string(),
+  middleName: z.string().optional(),
   lastName: z.string(),
 });
 

@@ -27,9 +27,9 @@ const createFaculty = catchAsync(async (req, res) => {
     message: 'Faculty is created succesfully',
     data: result,
   });
-})
+});
 
 export const UserControllers = {
   createStudent,
-  createFaculty
+  createFaculty,
 };

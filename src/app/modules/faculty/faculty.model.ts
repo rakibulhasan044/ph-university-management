@@ -91,27 +91,26 @@ const facultySchema = new Schema<TFaculty, FacultyModel>({
   },
 });
 
-
 // filter out deleted documents
 facultySchema.pre('find', function (next) {
-    this.find({ isDeleted: { $ne: true } });
-    next();
-  });
-  
-  facultySchema.pre('findOne', function (next) {
-    this.find({ isDeleted: { $ne: true } });
-    next();
-  });
-  
-  facultySchema.pre('aggregate', function (next) {
-    this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
-    next();
-  });
-  
-  //checking if user is already exist!
-  facultySchema.statics.isUserExists = async function (id: string) {
-    const existingUser = await Faculty.findOne({ id });
-    return existingUser;
-  };
-  
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+
+facultySchema.pre('findOne', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+
+facultySchema.pre('aggregate', function (next) {
+  this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
+  next();
+});
+
+//checking if user is already exist!
+facultySchema.statics.isUserExists = async function (id: string) {
+  const existingUser = await Faculty.findOne({ id });
+  return existingUser;
+};
+
 export const Faculty = model<TFaculty, FacultyModel>('Faculty', facultySchema);
