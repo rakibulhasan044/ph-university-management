@@ -41,21 +41,23 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
     statusCode = simplifiedError.statusCode;
     message = simplifiedError.message;
     errorSources = simplifiedError.errorSources;
-  }
-  else if (err instanceof AppError) {
+  } else if (err instanceof AppError) {
     statusCode = err.statusCode;
     message = err.message;
-    errorSources =[{
-      path: '',
-      message: err?.message
-    }];
-  }
-  else if (err instanceof Error) {
+    errorSources = [
+      {
+        path: '',
+        message: err?.message,
+      },
+    ];
+  } else if (err instanceof Error) {
     message = err.message;
-    errorSources =[{
-      path: '',
-      message: err?.message
-    }];
+    errorSources = [
+      {
+        path: '',
+        message: err?.message,
+      },
+    ];
   }
 
   res.status(statusCode).json({
