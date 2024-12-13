@@ -10,12 +10,15 @@ class QueryBuilder<T> {
   }
 
   search(searchableFields: string[]) {
-    const searchTerm = this?.query?.searchQuery
+    const searchTerm = this?.query?.searchQuery;
     if (searchTerm) {
       this.modelQuery = this.modelQuery.find({
-        $or: searchableFields.map((field) => ({
-          [field]: { $regex: searchTerm, $options: 'i' },
-        }) as FilterQuery<T>),
+        $or: searchableFields.map(
+          (field) =>
+            ({
+              [field]: { $regex: searchTerm, $options: 'i' },
+            }) as FilterQuery<T>,
+        ),
       });
     }
 
@@ -23,7 +26,7 @@ class QueryBuilder<T> {
   }
 
   filter() {
-    const queryObj = {...this.query};
+    const queryObj = { ...this.query };
 
     //filtering
     const excludeFields = ['searchTerm', 'sort', 'limit', 'page', 'fields'];
@@ -36,8 +39,9 @@ class QueryBuilder<T> {
   }
 
   sort() {
-    const sort = (this?.query?.sort as string)?.split(',')?.join(' ') || '-createdAt';
-    this.modelQuery = this.modelQuery.sort(sort as string)
+    const sort =
+      (this?.query?.sort as string)?.split(',')?.join(' ') || '-createdAt';
+    this.modelQuery = this.modelQuery.sort(sort as string);
 
     return this;
   }
@@ -53,7 +57,8 @@ class QueryBuilder<T> {
   }
 
   fields() {
-    const fields = (this?.query?.fields as string)?.split(',')?.join(' ') || '-__v';
+    const fields =
+      (this?.query?.fields as string)?.split(',')?.join(' ') || '-__v';
     this.modelQuery = this.modelQuery.select(fields);
 
     return this;
