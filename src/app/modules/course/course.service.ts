@@ -110,7 +110,7 @@ const updateCourseIntoDB = async (id: string, payload: Partial<TCourse>) => {
     await session.endSession();
 
     return result;
-  // eslint-disable-next-line no-unused-vars
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
     await session.abortTransaction();
     await session.endSession();
@@ -127,38 +127,41 @@ const deleteCourseFromDB = async (id: string) => {
   return result;
 };
 
-const assignFacultiesWithCourseIntoDB = async (id: string, payload: Partial<TCourseFaculty>) => {
-
+const assignFacultiesWithCourseIntoDB = async (
+  id: string,
+  payload: Partial<TCourseFaculty>,
+) => {
   const result = await CourseFaculty.findByIdAndUpdate(
     id,
     {
       course: id,
-      $addToSet: { faculties: { $each: payload}}
-    }, 
+      $addToSet: { faculties: { $each: payload } },
+    },
     {
       upsert: true,
-      new: true
-    }
-  )
+      new: true,
+    },
+  );
 
-  return result
-}
+  return result;
+};
 
-const removeFacultiesFromCourseFromDB = async (id: string, payload: Partial<TCourseFaculty>) => {
-
+const removeFacultiesFromCourseFromDB = async (
+  id: string,
+  payload: Partial<TCourseFaculty>,
+) => {
   const result = await CourseFaculty.findByIdAndUpdate(
     id,
     {
-      $pull: { faculties: { $in: payload}}
-    }, 
+      $pull: { faculties: { $in: payload } },
+    },
     {
-      new: true
-    }
-  )
+      new: true,
+    },
+  );
 
-  return result
-}
-
+  return result;
+};
 
 export const CourseServices = {
   createCourseIntoDB,
@@ -167,5 +170,5 @@ export const CourseServices = {
   updateCourseIntoDB,
   deleteCourseFromDB,
   assignFacultiesWithCourseIntoDB,
-  removeFacultiesFromCourseFromDB
+  removeFacultiesFromCourseFromDB,
 };

@@ -60,9 +60,3 @@ stack: config.node_env == 'development' ? err?.stack : null,
 };
 
 export default globalErrorHandler;
-
-
-
-
-
-
