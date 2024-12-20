@@ -9,7 +9,7 @@ const timeStringSchema = z.string().refine(
   {
     message: 'Invalid Time format, expected "HH:MM" in 24 hours formate',
   },
-)
+);
 
 const createOfferedCourseValidationSchema = z.object({
   body: z
@@ -23,7 +23,7 @@ const createOfferedCourseValidationSchema = z.object({
       section: z.number(),
       days: z.array(z.enum([...Days] as [string, ...string[]])),
       startTime: timeStringSchema,
-      endTime: timeStringSchema
+      endTime: timeStringSchema,
     })
     .refine(
       (body) => {
@@ -44,7 +44,7 @@ const updateOfferedCourseValidationSchema = z.object({
       maxCapacity: z.number(),
       days: z.array(z.enum([...Days] as [string, ...string[]])),
       startTime: timeStringSchema,
-      endTime: timeStringSchema
+      endTime: timeStringSchema,
     })
     .refine(
       (body) => {

@@ -14,7 +14,7 @@ router.post(
 router.patch(
   '/:id',
   validateRequest(OfferedCourseValidation.updateOfferedCourseValidationSchema),
-  OfferedCourseController.updateOfferedCourse
-)
+  OfferedCourseController.updateOfferedCourse,
+);
 
 export const OfferedCourseRoutes = router;
