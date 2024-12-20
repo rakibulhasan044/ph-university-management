@@ -1,5 +1,5 @@
 import express from 'express';
-import validateRequest from '../../utils/validateRequest';
+import validateRequest from '../../middlewares/validateRequest';
 import { SemesterRegistrationValidation } from './semesterRegistration.validation';
 import { SemesterRegistrationController } from './semesterRegistration.controller';
 
