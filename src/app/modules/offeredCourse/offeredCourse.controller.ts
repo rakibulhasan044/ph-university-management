@@ -42,22 +42,23 @@ const createOfferedCourse = catchAsync(async (req, res) => {
 //   });
 // });
 
-// const updateSemesterRegistration = catchAsync(async (req, res) => {
-//   const { id } = req.params;
-//   const result =
-//     await SemesterRegistrationService.updateSemesterRegistrationIntoDB(
-//       id,
-//       req.body,
-//     );
+const updateOfferedCourse = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result =
+    await offeredCourseServices.updateOfferedCourseIntoDB(
+      id,
+      req.body,
+    );
 
-//   sendResponse(res, {
-//     statusCode: 200,
-//     success: true,
-//     message: 'Semester registration update successfully',
-//     data: result,
-//   });
-// });
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Offered course updated successfully',
+    data: result,
+  });
+});
 
 export const OfferedCourseController = {
   createOfferedCourse,
+  updateOfferedCourse
 };

@@ -6,6 +6,7 @@ import { Faculty } from '../faculty/faculty.model';
 import { SemesterRegistration } from '../semesterRegistration/semesterRegistration.model';
 import { TOfferedCourse } from './offeredCourse.interface';
 import { OfferedCourse } from './offeredCourse.model';
+import { hasTimeConflict } from './offeredCourse.utils';
 
 const createOfferedCoursedIntoDB = async (payload: TOfferedCourse) => {
   const {
@@ -81,7 +82,6 @@ const createOfferedCoursedIntoDB = async (payload: TOfferedCourse) => {
     faculty,
     days: { $in: days }
   }).select('days startTime endTime');
-  // console.log(assignedSchedules);
 
   const newSchedule = {
     days,
@@ -89,21 +89,63 @@ const createOfferedCoursedIntoDB = async (payload: TOfferedCourse) => {
     endTime
   }
 
-  assignedSchedules.forEach((schedule) => {
-    const existingStartTime = new Date(`2001-01-01T${schedule.startTime}:00`);
-    const existingEndTime = new Date(`2001-01-01T${schedule.endTime}:00`);
-    const newStartTime = new Date(`2001-01-01T${newSchedule.startTime}:00`);
-    const newEndTime = new Date(`2001-01-01T${newSchedule.endTime}:00`);
+  if(hasTimeConflict(assignedSchedules, newSchedule)){
+    throw new AppError(400, 'This faculty is not available at that time ! Choose other time or day')
+  }
 
-    if(newStartTime < existingEndTime && newEndTime > existingStartTime) {
-      throw new AppError(400, 'This faculty is not available at that time ! choose other time or day')
-    }
-  })
   const result = await OfferedCourse.create({ ...payload, academicSemester });
   return result;
   // return null;
 };
 
+const updateOfferedCourseIntoDB = async (id: string, payload: Pick<TOfferedCourse, 'faculty' | 'days' | 'startTime' | 'endTime'>) => {
+
+  const { faculty, days, startTime, endTime } = payload
+
+  const isOfferedCourseExist = await OfferedCourse.findById(id);
+
+  if(!isOfferedCourseExist) {
+    throw new AppError(404, 'Offered course not found !!')
+  }
+
+
+
+  const isFacultyExist = await Faculty.findById(faculty);
+
+  if(!isFacultyExist) {
+    throw new AppError(404, 'Faculty not found !!')
+  }
+
+  const semesterRegistration = isOfferedCourseExist.semesterRegistration
+
+  const semesterRegistrationStatus = await SemesterRegistration.findById(semesterRegistration)
+  if(semesterRegistrationStatus?.status !== 'UPCOMING') {
+    throw new AppError(400, `Can not update this offered course as it is ${semesterRegistrationStatus?.status}!!`)
+  }
+
+  const assignedSchedules = await OfferedCourse.find({
+    semesterRegistration,
+    faculty,
+    days: { $in: days}
+  }).select("days startTime endTime");
+
+  const newSchedule = {
+    days,
+    startTime,
+    endTime
+  };
+
+  if(hasTimeConflict(assignedSchedules, newSchedule)) {
+    throw new AppError(400, 'This faculty is not available at that time! Choose other time or day')
+  }
+
+  const result = await OfferedCourse.findById(id, payload, {new: true});
+  return result;
+
+
+}
+
 export const offeredCourseServices = {
   createOfferedCoursedIntoDB,
+  updateOfferedCourseIntoDB
 };
