@@ -3,13 +3,12 @@ import AppError from '../../errors/AppError';
 import { User } from '../user/user.model';
 import { TLoginUser } from './auth.interface';
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcrypt';
 
 const loginUser = async (payload: TLoginUser) => {
   //check if the user exist
-
   const user = await User.isUserExistsByCustomId(payload?.id);
-  if (! user) {
+  if (!user) {
     throw new AppError(404, 'User not found');
   }
 
@@ -27,30 +26,35 @@ const loginUser = async (payload: TLoginUser) => {
     throw new AppError(403, 'This user is blocked');
   }
 
-  if(! await User.isPasswordMatched(payload?.password, user?.password)) {
+  if (!(await User.isPasswordMatched(payload?.password, user?.password))) {
     throw new AppError(403, 'Password not matched ! Try again !!');
   }
 
   //create token and send to the client
   const jwtPayload = {
     userId: user.id,
-    role:  user.role
-  }
+    role: user.role,
+  };
 
-  const accessToken = jwt.sign(jwtPayload, config.jwt_access_secret as string, { expiresIn: '10d' });
+  const accessToken = jwt.sign(jwtPayload, config.jwt_access_secret as string, {
+    expiresIn: '10d',
+  });
 
   return {
     accessToken,
-    needsPasswordChange: user?.needsPasswordChange
+    needsPasswordChange: user?.needsPasswordChange,
   };
 };
 
-const changePassword = async(userData: JwtPayload, payload: {
-  oldPassword: string, newPassword: string
-}) => {
-
+const changePassword = async (
+  userData: JwtPayload,
+  payload: {
+    oldPassword: string;
+    newPassword: string;
+  },
+) => {
   const user = await User.isUserExistsByCustomId(userData?.userId);
-  if (! user) {
+  if (!user) {
     throw new AppError(404, 'User not found');
   }
 
@@ -68,26 +72,32 @@ const changePassword = async(userData: JwtPayload, payload: {
     throw new AppError(403, 'This user is blocked');
   }
 
-  if(! await User.isPasswordMatched(payload?.oldPassword, user?.password)) {
+  if (!(await User.isPasswordMatched(payload?.oldPassword, user?.password))) {
     throw new AppError(403, 'Password not matched ! Try again !!');
   }
 
   //hash new password
-  const newHashedPassword = await bcrypt.hash(payload.newPassword, Number(config.bcrypt_salt_rounds));
+  const newHashedPassword = await bcrypt.hash(
+    payload.newPassword,
+    Number(config.bcrypt_salt_rounds),
+  );
 
-  await User.findOneAndUpdate({
-    id: userData.userId,
-    role: userData.role
-  },{
-    password: newHashedPassword,
-    needsPasswordChange: false,
-    passwordChangedAt: new Date()
-  })
+  await User.findOneAndUpdate(
+    {
+      id: userData.userId,
+      role: userData.role,
+    },
+    {
+      password: newHashedPassword,
+      needsPasswordChange: false,
+      passwordChangedAt: new Date(),
+    },
+  );
 
   return null;
-}
+};
 
 export const AuthServices = {
   loginUser,
-  changePassword
+  changePassword,
 };
