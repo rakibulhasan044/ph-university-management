@@ -23,6 +23,8 @@ export type TAdmin = {
     user: Types.ObjectId;
     designation: string;
     name: TUserName;
+    gender: TGender;
+    bloodGroup: TBloodGroup, 
     dateOfBirth?: Date;
     email: string;
     contactNo: string;
