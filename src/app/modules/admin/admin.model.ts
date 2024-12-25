@@ -1,5 +1,5 @@
-import { Schema } from 'mongoose';
-import { TAdmin, TUserName } from './admin.interface';
+import { model, Schema } from 'mongoose';
+import { AdminModel, TAdmin, TUserName } from './admin.interface';
 import { BloodGroup, Gender } from './admin.constant';
 
 const userNameSchema = new Schema<TUserName>({
@@ -115,3 +115,5 @@ adminSchema.pre('aggregate', function (next) {
   this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
   next();
 });
+
+export const Admin = model<TAdmin, AdminModel>('Admin', adminSchema);
