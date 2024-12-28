@@ -72,7 +72,7 @@ userSchema.statics.isPasswordMatched = async function (
   return await bcrypt.compare(plainTextPassword, hashedPassword);
 };
 
-userSchema.statics.isJWTIssuedBeforePasswordChanged = async function (
+userSchema.statics.isJWTIssuedBeforePasswordChanged = function (
   passwordChangedTimesTamp: Date,
   jwtIssuedTimestamp: number,
 ) {
