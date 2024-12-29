@@ -18,8 +18,9 @@ import { AcademicDepartment } from '../academicDepartment/academicDepartment.mod
 import { Faculty } from '../faculty/faculty.model';
 import { TAdmin } from '../admin/admin.interface';
 import { Admin } from '../admin/admin.model';
+import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 
-const createStudentIntoDB = async (password: string, payload: TStudent) => {
+const createStudentIntoDB = async (file: any, password: string, payload: TStudent) => {
   //create a user object
   const userData: Partial<TUser> = {};
 
@@ -45,6 +46,12 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
     //generate id
     userData.id = await generateStudentId(admissionSemester);
 
+    const imageName: string = `${userData.id}${payload?.name?.firstName}`
+    const path = file?.path
+    //test
+    const { secure_url } = await sendImageToCloudinary(imageName, path);
+
+
     //create a user (transaction-1)
     const newUser = await User.create([userData], { session }); //age chilo object transaction user korar jonno array hoise
 
@@ -55,6 +62,7 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
     //set id, _id as user
     payload.id = newUser[0].id;
     payload.user = newUser[0]._id; //reference _id
+    payload.profileImage = secure_url
 
     //create a student (transaction-2)
     const newStudent = await Student.create([payload], { session });
