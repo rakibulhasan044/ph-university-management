@@ -60,9 +60,9 @@ const moduleRoutes = [
     route: AcademicDepartmentRoutes,
   },
   {
-    path:'/enrolled-course',
-    route: EnrolledCourseRoutes
-  }
+    path: '/enrolled-course',
+    route: EnrolledCourseRoutes,
+  },
 ];
 
 moduleRoutes.forEach((route) => router.use(route.path, route.route));
