@@ -7,6 +7,8 @@ import { TEnrolledCourse } from './enrolledCourses.interface';
 import EnrolledCourse from './enrolledCourses.model.';
 import { SemesterRegistration } from '../semesterRegistration/semesterRegistration.model';
 import { Course } from '../course/course.model';
+import { Faculty } from '../faculty/faculty.model';
+import { calculateGradeAndPont } from './enrolledCourse.utils';
 
 const createEnrolledCourseIntoDB = async (
   userId: string,
@@ -139,6 +141,90 @@ const createEnrolledCourseIntoDB = async (
   }
 };
 
+const updateEnrolledCourseMArksIntoDB = async (
+  facultyId: string,
+  payload: Partial<TEnrolledCourse>,
+) => {
+  const { semesterRegistration, offeredCourse, student, courseMarks } = payload;
+
+  const isSemesterRegistrationExists =
+    await SemesterRegistration.findById(semesterRegistration);
+
+  if (!isSemesterRegistrationExists) {
+    throw new AppError(404, 'Semester registration not found !!');
+  }
+
+  const isOfferedCourseExists = await OfferedCourse.findById(offeredCourse);
+
+  if (!isOfferedCourseExists) {
+    throw new AppError(404, 'Offered course not found !!');
+  }
+
+  const isStudentExists = await Student.findById(student);
+
+  if (!isStudentExists) {
+    throw new AppError(404, 'Student not found !!');
+  }
+
+  const faculty = await Faculty.findOne({ id: facultyId }, { _id: 1 });
+  if (!faculty) {
+    throw new AppError(404, 'Faculty not found !!');
+  }
+
+  //check if the course is taken by the faculty
+
+  const isCourseBelongToFaculty = await EnrolledCourse.findOne({
+    semesterRegistration,
+    offeredCourse,
+    student,
+    faculty: faculty._id,
+  });
+
+  if (!isCourseBelongToFaculty) {
+    throw new AppError(403, 'You are not allowed to update this course marks');
+  }
+
+  const modifiedData: Record<string, unknown> = {
+    ...courseMarks,
+  };
+
+  if (courseMarks?.finalTerm) {
+    const { classTest1, midTerm, classTest2, finalTerm } =
+      isCourseBelongToFaculty.courseMarks;
+
+    // Normalize the scores to scale them to 100
+    const normalizedClassTest1 = (classTest1 / 30) * 100;
+    const normalizedMidTerm = (midTerm / 70) * 100;
+    const normalizedClassTest2 = (classTest2 / 30) * 100;
+    const normalizedFinalTerm = (finalTerm / 70) * 100;
+
+    const totalMarks =
+      normalizedClassTest1 * 0.1 +
+      normalizedMidTerm * 0.3 +
+      normalizedClassTest2 * 0.1 +
+      normalizedFinalTerm * 0.5;
+
+    const result = calculateGradeAndPont(totalMarks);
+    modifiedData.grade = result.grade
+    modifiedData.gradePoints = result.gradePoints
+    modifiedData.isCompleted = true
+  }
+
+  if (courseMarks && Object.keys(courseMarks).length) {
+    for (const [key, value] of Object.entries(courseMarks)) {
+      modifiedData[`courseMarks.${key}`] = value;
+    }
+  }
+
+  const result = await EnrolledCourse.findByIdAndUpdate(
+    isCourseBelongToFaculty._id,
+    modifiedData,
+    { new: true },
+  );
+
+  return result;
+};
 export const EnrolledCourseServices = {
   createEnrolledCourseIntoDB,
+  updateEnrolledCourseMArksIntoDB,
 };
