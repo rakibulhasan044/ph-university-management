@@ -18,8 +18,10 @@ router.post(
 router.patch(
   '/update-enrolled-course-marks',
   auth('faculty'),
-  validateRequest(EnrolledCourseValidations.updateEnrolledCourseMarksValidationZodSchema),
-  EnrolledCourseControllers.updateEnrolledCourseMArks
-)
+  validateRequest(
+    EnrolledCourseValidations.updateEnrolledCourseMarksValidationZodSchema,
+  ),
+  EnrolledCourseControllers.updateEnrolledCourseMArks,
+);
 
 export const EnrolledCourseRoutes = router;

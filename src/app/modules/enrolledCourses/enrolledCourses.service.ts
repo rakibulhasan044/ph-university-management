@@ -205,9 +205,9 @@ const updateEnrolledCourseMArksIntoDB = async (
       normalizedFinalTerm * 0.5;
 
     const result = calculateGradeAndPont(totalMarks);
-    modifiedData.grade = result.grade
-    modifiedData.gradePoints = result.gradePoints
-    modifiedData.isCompleted = true
+    modifiedData.grade = result.grade;
+    modifiedData.gradePoints = result.gradePoints;
+    modifiedData.isCompleted = true;
   }
 
   if (courseMarks && Object.keys(courseMarks).length) {
